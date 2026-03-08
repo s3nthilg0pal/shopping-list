@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: ghcr.io/s3nthilg0pal/shopping-list/backend:2ff6adf
+          image: ghcr.io/s3nthilg0pal/shopping-list/backend:0f6cfd7
           imagePullPolicy: Always
           ports:
             - containerPort: 8000

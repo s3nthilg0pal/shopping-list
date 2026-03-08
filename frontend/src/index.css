@@ -1,0 +1,121 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 8-bit pixel borders */
+@layer components {
+  .pixel-border {
+    @apply border-2 border-retro-primary;
+    box-shadow:
+      4px 4px 0px 0px rgba(0, 255, 65, 0.25),
+      inset 1px 1px 0px 0px rgba(255, 255, 255, 0.1);
+  }
+
+  .pixel-border-gold {
+    @apply border-2 border-retro-gold;
+    box-shadow:
+      4px 4px 0px 0px rgba(255, 215, 0, 0.25),
+      inset 1px 1px 0px 0px rgba(255, 255, 255, 0.1);
+  }
+
+  .pixel-border-accent {
+    @apply border-2 border-retro-accent;
+    box-shadow:
+      4px 4px 0px 0px rgba(255, 0, 102, 0.25),
+      inset 1px 1px 0px 0px rgba(255, 255, 255, 0.1);
+  }
+
+  .pixel-btn {
+    @apply px-4 py-3 font-pixel text-xs uppercase tracking-wider
+           border-2 border-retro-primary bg-retro-panel text-retro-primary
+           active:translate-x-1 active:translate-y-1 transition-transform duration-75
+           hover:bg-retro-primary hover:text-retro-bg;
+    box-shadow: 4px 4px 0px 0px rgba(0, 255, 65, 0.4);
+  }
+
+  .pixel-btn:active {
+    box-shadow: 1px 1px 0px 0px rgba(0, 255, 65, 0.4);
+  }
+
+  .pixel-btn-danger {
+    @apply px-4 py-3 font-pixel text-xs uppercase tracking-wider
+           border-2 border-retro-danger bg-retro-panel text-retro-danger
+           active:translate-x-1 active:translate-y-1 transition-transform duration-75
+           hover:bg-retro-danger hover:text-retro-bg;
+    box-shadow: 4px 4px 0px 0px rgba(255, 0, 68, 0.4);
+  }
+
+  .pixel-btn-danger:active {
+    box-shadow: 1px 1px 0px 0px rgba(255, 0, 68, 0.4);
+  }
+
+  .pixel-btn-gold {
+    @apply px-4 py-3 font-pixel text-xs uppercase tracking-wider
+           border-2 border-retro-gold bg-retro-panel text-retro-gold
+           active:translate-x-1 active:translate-y-1 transition-transform duration-75
+           hover:bg-retro-gold hover:text-retro-bg;
+    box-shadow: 4px 4px 0px 0px rgba(255, 215, 0, 0.4);
+  }
+
+  .pixel-input {
+    @apply w-full px-3 py-3 font-pixel text-xs
+           bg-retro-bg border-2 border-retro-muted text-retro-text
+           focus:border-retro-primary focus:outline-none
+           placeholder:text-retro-muted;
+  }
+
+  /* Custom checkbox – 8-bit style */
+  .pixel-checkbox {
+    @apply relative w-6 h-6 border-2 border-retro-primary bg-retro-bg
+           flex items-center justify-center cursor-pointer shrink-0;
+  }
+
+  .pixel-checkbox.checked {
+    @apply bg-retro-primary;
+  }
+
+  .pixel-checkbox.checked::after {
+    content: '✕';
+    @apply text-retro-bg text-xs font-pixel;
+  }
+
+  /* Scanlines overlay */
+  .scanlines::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.08) 2px,
+      rgba(0, 0, 0, 0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0f0f23;
+}
+::-webkit-scrollbar-thumb {
+  background: #00ff41;
+  border: 1px solid #0f0f23;
+}
+
+/* Remove default focus ring */
+*:focus {
+  outline: none;
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}

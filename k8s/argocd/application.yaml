@@ -10,7 +10,7 @@ spec:
 
   source:
     # UPDATE: Point to your git repository
-    repoURL: https://github.com/<YOUR_USERNAME>/shopping-list.git
+    repoURL: https://github.com/s3nthilg0pal/shopping-list.git
     targetRevision: main
     path: k8s/base
 

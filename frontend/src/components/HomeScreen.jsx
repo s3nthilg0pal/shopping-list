@@ -35,7 +35,6 @@ export default function HomeScreen({ onOpenList, onHistory }) {
 
   const handleDelete = async (e, id) => {
     e.stopPropagation();
-    if (!confirm('DELETE THIS LIST?')) return;
     try {
       await api.deleteList(id);
       fetchLists();

@@ -17,8 +17,8 @@ spec:
     spec:
       containers:
         - name: backend
-          image: shopping-list-backend:latest
-          imagePullPolicy: IfNotPresent
+          image: ghcr.io/s3nthilg0pal/shopping-list/backend:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8000
           env:

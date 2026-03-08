@@ -17,8 +17,8 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: shopping-list-frontend:latest
-          imagePullPolicy: IfNotPresent
+          image: ghcr.io/s3nthilg0pal/shopping-list/frontend:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
           resources:

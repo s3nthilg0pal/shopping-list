@@ -29,4 +29,22 @@ export const api = {
   addItem: (listId, data) => request(`/lists/${listId}/items`, { method: 'POST', body: JSON.stringify(data) }),
   updateItem: (listId, itemId, data) => request(`/lists/${listId}/items/${itemId}`, { method: 'PATCH', body: JSON.stringify(data) }),
   deleteItem: (listId, itemId) => request(`/lists/${listId}/items/${itemId}`, { method: 'DELETE' }),
+
+  // Item images
+  uploadItemImage: async (listId, itemId, file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await fetch(`${API_BASE}/lists/${listId}/items/${itemId}/image`, {
+      method: 'POST',
+      body: formData,
+    });
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({ detail: 'Unknown error' }));
+      throw new Error(error.detail || `HTTP ${res.status}`);
+    }
+    return res.json();
+  },
+  deleteItemImage: (listId, itemId) =>
+    request(`/lists/${listId}/items/${itemId}/image`, { method: 'DELETE' }),
+  getItemImageUrl: (listId, itemId) => `${API_BASE}/lists/${listId}/items/${itemId}/image`,
 };

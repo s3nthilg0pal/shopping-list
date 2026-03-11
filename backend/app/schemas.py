@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, computed_field, Field
 from datetime import date, datetime
 from typing import Optional
 
@@ -22,6 +22,12 @@ class ShoppingItemResponse(ShoppingItemBase):
     checked: bool
     shopping_list_id: int
     created_at: datetime
+    image_content_type: Optional[str] = Field(default=None, exclude=True)
+
+    @computed_field
+    @property
+    def has_image(self) -> bool:
+        return self.image_content_type is not None
 
     class Config:
         from_attributes = True

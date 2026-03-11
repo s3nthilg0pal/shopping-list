@@ -141,8 +141,10 @@ export default function ListDetail({ listId, onBack }) {
               <ItemRow
                 key={item.id}
                 item={item}
+                listId={listId}
                 onToggle={() => handleToggle(item)}
                 onDelete={() => handleDeleteItem(item.id)}
+                onRefresh={fetchList}
               />
             ))}
           </div>
@@ -158,8 +160,10 @@ export default function ListDetail({ listId, onBack }) {
               <ItemRow
                 key={item.id}
                 item={item}
+                listId={listId}
                 onToggle={() => handleToggle(item)}
                 onDelete={() => handleDeleteItem(item.id)}
+                onRefresh={fetchList}
               />
             ))}
           </div>
@@ -176,33 +180,112 @@ export default function ListDetail({ listId, onBack }) {
   );
 }
 
-function ItemRow({ item, onToggle, onDelete }) {
+function ItemRow({ item, listId, onToggle, onDelete, onRefresh }) {
+  const fileInputRef = useRef(null);
+  const [uploading, setUploading] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+
+  const handleImageCapture = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      await api.uploadItemImage(listId, item.id, file);
+      onRefresh();
+    } catch (err) {
+      console.error('Failed to upload image', err);
+    } finally {
+      setUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleDeleteImage = async (e) => {
+    e.stopPropagation();
+    try {
+      await api.deleteItemImage(listId, item.id);
+      setExpanded(false);
+      onRefresh();
+    } catch (err) {
+      console.error('Failed to delete image', err);
+    }
+  };
+
   return (
     <div
-      className={`flex items-center gap-3 p-3 border-2 transition-colors ${
+      className={`flex flex-col border-2 transition-colors ${
         item.checked
           ? 'bg-retro-bg border-retro-muted'
           : 'bg-retro-panel border-retro-border hover:border-retro-primary'
       }`}
     >
-      <div
-        onClick={onToggle}
-        className={`pixel-checkbox ${item.checked ? 'checked' : ''}`}
-      />
-      <span
-        onClick={onToggle}
-        className={`flex-1 text-xs cursor-pointer select-none ${
-          item.checked ? 'text-retro-muted line-through' : 'text-retro-text'
-        }`}
-      >
-        {item.name}
-      </span>
-      <button
-        onClick={onDelete}
-        className="text-retro-danger text-[10px] hover:bg-retro-danger hover:text-retro-bg px-2 py-1 border border-transparent hover:border-retro-danger"
-      >
-        DEL
-      </button>
+      <div className="flex items-center gap-3 p-3">
+        <div
+          onClick={onToggle}
+          className={`pixel-checkbox ${item.checked ? 'checked' : ''}`}
+        />
+        <span
+          onClick={onToggle}
+          className={`flex-1 text-xs cursor-pointer select-none ${
+            item.checked ? 'text-retro-muted line-through' : 'text-retro-text'
+          }`}
+        >
+          {item.name}
+        </span>
+
+        {/* Image indicator / expand toggle */}
+        {item.has_image && (
+          <button
+            onClick={() => setExpanded((v) => !v)}
+            className="text-retro-gold text-[10px] hover:text-retro-primary px-1"
+            title={expanded ? 'Hide image' : 'Show image'}
+          >
+            {expanded ? '▲IMG' : '▼IMG'}
+          </button>
+        )}
+
+        {/* Camera / upload button */}
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploading}
+          className="text-retro-secondary text-[10px] hover:bg-retro-secondary hover:text-retro-bg px-2 py-1 border border-transparent hover:border-retro-secondary disabled:opacity-50"
+          title="Capture or upload image"
+        >
+          {uploading ? '...' : '📷'}
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          onChange={handleImageCapture}
+        />
+
+        <button
+          onClick={onDelete}
+          className="text-retro-danger text-[10px] hover:bg-retro-danger hover:text-retro-bg px-2 py-1 border border-transparent hover:border-retro-danger"
+        >
+          DEL
+        </button>
+      </div>
+
+      {/* Expanded image view */}
+      {item.has_image && expanded && (
+        <div className="px-3 pb-3 flex flex-col items-start gap-2">
+          <img
+            src={api.getItemImageUrl(listId, item.id)}
+            alt={item.name}
+            className="max-w-full max-h-48 border-2 border-retro-border object-contain"
+          />
+          <button
+            onClick={handleDeleteImage}
+            className="text-retro-danger text-[10px] hover:bg-retro-danger hover:text-retro-bg px-2 py-1 border border-retro-danger"
+          >
+            REMOVE IMAGE
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import date
@@ -142,3 +143,64 @@ def delete_item(list_id: int, item_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Item not found")
     db.delete(item)
     db.commit()
+
+
+# --- Item Images ---
+ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
+MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5 MB
+
+
+@router.post("/lists/{list_id}/items/{item_id}/image", response_model=ShoppingItemResponse, status_code=200)
+async def upload_item_image(
+    list_id: int,
+    item_id: int,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+):
+    item = (
+        db.query(ShoppingItem)
+        .filter(ShoppingItem.id == item_id, ShoppingItem.shopping_list_id == list_id)
+        .first()
+    )
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    if file.content_type not in ALLOWED_IMAGE_TYPES:
+        raise HTTPException(status_code=400, detail=f"Unsupported image type: {file.content_type}")
+    data = await file.read()
+    if len(data) > MAX_IMAGE_SIZE:
+        raise HTTPException(status_code=400, detail="Image exceeds 5 MB limit")
+    item.image_data = data
+    item.image_content_type = file.content_type
+    db.commit()
+    db.refresh(item)
+    return item
+
+
+@router.get("/lists/{list_id}/items/{item_id}/image")
+def get_item_image(list_id: int, item_id: int, db: Session = Depends(get_db)):
+    item = (
+        db.query(ShoppingItem)
+        .filter(ShoppingItem.id == item_id, ShoppingItem.shopping_list_id == list_id)
+        .first()
+    )
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    if not item.image_data:
+        raise HTTPException(status_code=404, detail="No image for this item")
+    return Response(content=item.image_data, media_type=item.image_content_type)
+
+
+@router.delete("/lists/{list_id}/items/{item_id}/image", response_model=ShoppingItemResponse)
+def delete_item_image(list_id: int, item_id: int, db: Session = Depends(get_db)):
+    item = (
+        db.query(ShoppingItem)
+        .filter(ShoppingItem.id == item_id, ShoppingItem.shopping_list_id == list_id)
+        .first()
+    )
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    item.image_data = None
+    item.image_content_type = None
+    db.commit()
+    db.refresh(item)
+    return item

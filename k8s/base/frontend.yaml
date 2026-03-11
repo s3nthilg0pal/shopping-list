@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: ghcr.io/s3nthilg0pal/shopping-list/frontend:0f6cfd7
+          image: ghcr.io/s3nthilg0pal/shopping-list/frontend:7ca1224
           imagePullPolicy: Always
           ports:
             - containerPort: 80
